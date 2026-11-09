@@ -1,0 +1,14 @@
+//
+// SPDX-FileCopyrightText: The Z2577 Project
+// SPDX-License-Identifier: Apache-2.0
+//
+
+soong_namespace {}
+
+// Every HAL in this tree, so a product inherits one name
+phony {
+    name: "unisoc_hal",
+    required: [
+        "android.hardware.light-service.unisoc",
+    ],
+}
