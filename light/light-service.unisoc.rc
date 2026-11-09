@@ -1,0 +1,5 @@
+service vendor.light-unisoc /vendor/bin/hw/android.hardware.light-service.unisoc
+    class hal
+    user system
+    group system
+    shutdown critical

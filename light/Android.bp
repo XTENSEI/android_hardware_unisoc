@@ -1,0 +1,22 @@
+//
+// SPDX-FileCopyrightText: The Z2577 Project
+// SPDX-License-Identifier: Apache-2.0
+//
+
+cc_binary {
+    name: "android.hardware.light-service.unisoc",
+    relative_install_path: "hw",
+    init_rc: ["light-service.unisoc.rc"],
+    vintf_fragments: ["light-service.unisoc.xml"],
+    vendor: true,
+    srcs: [
+        "Lights.cpp",
+        "main.cpp",
+    ],
+    shared_libs: [
+        "android.hardware.light-V2-ndk",
+        "libbase",
+        "libbinder_ndk",
+        "liblog",
+    ],
+}
