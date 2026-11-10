@@ -17,7 +17,9 @@ namespace aidl::android::hardware::light {
 namespace {
 
 constexpr int32_t kBacklightId = 0;
+constexpr int32_t kNotificationId = 1;
 constexpr char kBacklightDir[] = "/sys/class/backlight/sprd_backlight/";
+constexpr char kLedDir[] = "/sys/class/leds/sc27xx:";
 
 int32_t readMaxBrightness() {
     std::string value;
@@ -29,14 +31,7 @@ int32_t readMaxBrightness() {
     return max > 0 ? max : 255;
 }
 
-}  // namespace
-
-Lights::Lights() : max_brightness_(readMaxBrightness()) {}
-
-ndk::ScopedAStatus Lights::setLightBacklight(const HwLightState& state) {
-    int32_t brightness = state.color & 0xff;
-    int32_t value = (brightness * max_brightness_ + 127) / 255;
-    std::string path = std::string(kBacklightDir) + "brightness";
+ndk::ScopedAStatus writeBrightness(const std::string& path, int32_t value) {
     if (!::android::base::WriteStringToFile(std::to_string(value), path)) {
         LOG(ERROR) << "Cannot write " << value << " to " << path;
         return ndk::ScopedAStatus::fromServiceSpecificError(errno != 0 ? errno : EIO);
@@ -44,16 +39,44 @@ ndk::ScopedAStatus Lights::setLightBacklight(const HwLightState& state) {
     return ndk::ScopedAStatus::ok();
 }
 
-ndk::ScopedAStatus Lights::setLightState(int32_t id, const HwLightState& state) {
-    if (id == kBacklightId) {
-        return setLightBacklight(state);
+}  // namespace
+
+Lights::Lights() : max_brightness_(readMaxBrightness()) {}
+
+ndk::ScopedAStatus Lights::setLightBacklight(const HwLightState& state) {
+    int32_t brightness = state.color & 0xff;
+    int32_t value = (brightness * max_brightness_ + 127) / 255;
+    return writeBrightness(std::string(kBacklightDir) + "brightness", value);
+}
+
+ndk::ScopedAStatus Lights::setLightNotification(const HwLightState& state) {
+    ndk::ScopedAStatus status =
+            writeBrightness(std::string(kLedDir) + "red/brightness", (state.color >> 16) & 0xff);
+    if (!status.isOk()) {
+        return status;
     }
-    return ndk::ScopedAStatus::fromExceptionCode(EX_UNSUPPORTED_OPERATION);
+    status = writeBrightness(std::string(kLedDir) + "green/brightness", (state.color >> 8) & 0xff);
+    if (!status.isOk()) {
+        return status;
+    }
+    return writeBrightness(std::string(kLedDir) + "blue/brightness", state.color & 0xff);
+}
+
+ndk::ScopedAStatus Lights::setLightState(int32_t id, const HwLightState& state) {
+    switch (id) {
+        case kBacklightId:
+            return setLightBacklight(state);
+        case kNotificationId:
+            return setLightNotification(state);
+        default:
+            return ndk::ScopedAStatus::fromExceptionCode(EX_UNSUPPORTED_OPERATION);
+    }
 }
 
 ndk::ScopedAStatus Lights::getLights(std::vector<HwLight>* lights) {
     lights->clear();
     lights->push_back(HwLight{kBacklightId, 0, LightType::BACKLIGHT});
+    lights->push_back(HwLight{kNotificationId, 0, LightType::NOTIFICATIONS});
     return ndk::ScopedAStatus::ok();
 }
 

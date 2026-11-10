@@ -18,6 +18,7 @@ class Lights : public BnLights {
 
   private:
     ndk::ScopedAStatus setLightBacklight(const HwLightState& state);
+    ndk::ScopedAStatus setLightNotification(const HwLightState& state);
 
     int32_t max_brightness_;
 };
