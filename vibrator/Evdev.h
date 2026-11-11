@@ -17,7 +17,7 @@ class Evdev {
 
     bool start(int32_t duration_ms);
     void stop();
-    bool setGain(int32_t gain);
+    void setMagnitude(int32_t magnitude);
 
   private:
     bool open();
@@ -27,6 +27,7 @@ class Evdev {
     std::string path_;
     int32_t fd_ = -1;
     int32_t effect_id_ = -1;
+    int32_t magnitude_ = 0xffff;
 };
 
 }  // namespace aidl::android::hardware::vibrator

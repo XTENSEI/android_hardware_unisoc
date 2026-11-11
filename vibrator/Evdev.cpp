@@ -50,8 +50,8 @@ bool Evdev::upload(int32_t duration_ms) {
     effect.type = FF_RUMBLE;
     effect.id = effect_id_;
     effect.replay.length = duration_ms;
-    effect.u.rumble.strong_magnitude = 0xffff;
-    effect.u.rumble.weak_magnitude = 0xffff;
+    effect.u.rumble.strong_magnitude = magnitude_;
+    effect.u.rumble.weak_magnitude = magnitude_;
     if (ioctl(fd_, EVIOCSFF, &effect) < 0) {
         return false;
     }
@@ -73,8 +73,8 @@ void Evdev::stop() {
     writeEvent(EV_FF, effect_id_, 0);
 }
 
-bool Evdev::setGain(int32_t gain) {
-    return writeEvent(EV_FF, FF_GAIN, gain);
+void Evdev::setMagnitude(int32_t magnitude) {
+    magnitude_ = magnitude;
 }
 
 }  // namespace aidl::android::hardware::vibrator

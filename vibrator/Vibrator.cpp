@@ -20,7 +20,7 @@ constexpr char kEvdevPath[] = "/dev/input/event1";
 Vibrator::Vibrator() : device_(kEvdevPath) {}
 
 ndk::ScopedAStatus Vibrator::getCapabilities(int32_t* _aidl_return) {
-    *_aidl_return = 0;
+    *_aidl_return = CAP_AMPLITUDE_CONTROL;
     return ndk::ScopedAStatus::ok();
 }
 
@@ -51,8 +51,15 @@ ndk::ScopedAStatus Vibrator::getSupportedEffects(std::vector<Effect>* _aidl_retu
     return ndk::ScopedAStatus::ok();
 }
 
-ndk::ScopedAStatus Vibrator::setAmplitude(float) {
-    return ndk::ScopedAStatus::fromExceptionCode(EX_UNSUPPORTED_OPERATION);
+ndk::ScopedAStatus Vibrator::setAmplitude(float amplitude) {
+    int32_t magnitude = 0;
+    if (amplitude > 1.0f) {
+        magnitude = 0xffff;
+    } else if (amplitude > 0.0f) {
+        magnitude = static_cast<int32_t>(amplitude * 0xffff);
+    }
+    device_.setMagnitude(magnitude);
+    return ndk::ScopedAStatus::ok();
 }
 
 ndk::ScopedAStatus Vibrator::setExternalControl(bool) {
