@@ -5,7 +5,19 @@
 
 #include "Vibrator.h"
 
+#include <cerrno>
+
+#include <android-base/logging.h>
+
 namespace aidl::android::hardware::vibrator {
+
+namespace {
+
+constexpr char kEvdevPath[] = "/dev/input/event1";
+
+}  // namespace
+
+Vibrator::Vibrator() : device_(kEvdevPath) {}
 
 ndk::ScopedAStatus Vibrator::getCapabilities(int32_t* _aidl_return) {
     *_aidl_return = 0;
@@ -13,11 +25,20 @@ ndk::ScopedAStatus Vibrator::getCapabilities(int32_t* _aidl_return) {
 }
 
 ndk::ScopedAStatus Vibrator::off() {
+    device_.stop();
     return ndk::ScopedAStatus::ok();
 }
 
-ndk::ScopedAStatus Vibrator::on(int32_t, const std::shared_ptr<IVibratorCallback>&) {
-    return ndk::ScopedAStatus::fromExceptionCode(EX_UNSUPPORTED_OPERATION);
+ndk::ScopedAStatus Vibrator::on(int32_t timeoutMs, const std::shared_ptr<IVibratorCallback>&) {
+    if (timeoutMs <= 0) {
+        device_.stop();
+        return ndk::ScopedAStatus::ok();
+    }
+    if (!device_.start(timeoutMs)) {
+        LOG(ERROR) << "Cannot vibrate for " << timeoutMs << " ms";
+        return ndk::ScopedAStatus::fromServiceSpecificError(errno != 0 ? errno : EIO);
+    }
+    return ndk::ScopedAStatus::ok();
 }
 
 ndk::ScopedAStatus Vibrator::perform(Effect, EffectStrength,

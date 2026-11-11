@@ -11,10 +11,14 @@
 #include <memory>
 #include <vector>
 
+#include "Evdev.h"
+
 namespace aidl::android::hardware::vibrator {
 
 class Vibrator : public BnVibrator {
   public:
+    Vibrator();
+
     ndk::ScopedAStatus getCapabilities(int32_t* _aidl_return) override;
     ndk::ScopedAStatus off() override;
     ndk::ScopedAStatus on(int32_t timeoutMs,
@@ -45,6 +49,9 @@ class Vibrator : public BnVibrator {
     ndk::ScopedAStatus getSupportedBraking(std::vector<Braking>* _aidl_return) override;
     ndk::ScopedAStatus composePwle(const std::vector<PrimitivePwle>& composite,
                                    const std::shared_ptr<IVibratorCallback>& callback) override;
+
+  private:
+    Evdev device_;
 };
 
 }  // namespace aidl::android::hardware::vibrator
