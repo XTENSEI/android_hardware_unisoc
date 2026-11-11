@@ -1,0 +1,5 @@
+service vendor.vibrator-unisoc /vendor/bin/hw/android.hardware.vibrator-service.unisoc
+    class hal
+    user system
+    group system
+    shutdown critical

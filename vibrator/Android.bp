@@ -1,0 +1,23 @@
+//
+// SPDX-FileCopyrightText: The Z2577 Project
+// SPDX-License-Identifier: Apache-2.0
+//
+
+cc_binary {
+    name: "android.hardware.vibrator-service.unisoc",
+    relative_install_path: "hw",
+    init_rc: ["vibrator-service.unisoc.rc"],
+    vintf_fragments: ["vibrator-service.unisoc.xml"],
+    vendor: true,
+    srcs: [
+        "Vibrator.cpp",
+        "VibratorManager.cpp",
+        "main.cpp",
+    ],
+    shared_libs: [
+        "android.hardware.vibrator-V2-ndk",
+        "libbase",
+        "libbinder_ndk",
+        "liblog",
+    ],
+}
