@@ -1,0 +1,4 @@
+service vendor.thermal-unisoc /vendor/bin/hw/android.hardware.thermal-service.unisoc
+    class hal
+    user system
+    group system

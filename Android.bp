@@ -11,6 +11,7 @@ phony {
     required: [
         "android.hardware.light-service.unisoc",
         "android.hardware.memtrack-service.unisoc",
+        "android.hardware.thermal-service.unisoc",
         "android.hardware.vibrator-service.unisoc",
     ],
 }

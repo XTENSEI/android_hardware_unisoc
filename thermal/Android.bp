@@ -1,0 +1,23 @@
+//
+// SPDX-FileCopyrightText: The Z2577 Project
+// SPDX-License-Identifier: Apache-2.0
+//
+
+cc_binary {
+    name: "android.hardware.thermal-service.unisoc",
+    relative_install_path: "hw",
+    init_rc: ["thermal-service.unisoc.rc"],
+    vintf_fragments: ["thermal-service.unisoc.xml"],
+    vendor: true,
+    srcs: [
+        "Thermal.cpp",
+        "Zones.cpp",
+        "main.cpp",
+    ],
+    shared_libs: [
+        "android.hardware.thermal-V3-ndk",
+        "libbase",
+        "libbinder_ndk",
+        "liblog",
+    ],
+}
