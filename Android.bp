@@ -10,6 +10,7 @@ phony {
     name: "unisoc_hal",
     required: [
         "android.hardware.light-service.unisoc",
+        "android.hardware.memtrack-service.unisoc",
         "android.hardware.vibrator-service.unisoc",
     ],
 }
